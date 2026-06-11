@@ -13,7 +13,8 @@ export const populationDistributionPresets: Record<
 > = {
   "us-census-2020": {
     name: "US Census 2020 (children 7-17)",
-    ageRange: {"7to9": 0.27, "10to12": 0.27, "13to17": 0.46},
+    // The preset models children 7-17 only; the 4to6 band gets no allocation.
+    ageRange: {"4to6": 0, "7to9": 0.27, "10to12": 0.27, "13to17": 0.46},
     gender: {girl: 0.5, boy: 0.5},
     ses: {low: 0.28, middle: 0.46, high: 0.26},
     raceEthnicity: {

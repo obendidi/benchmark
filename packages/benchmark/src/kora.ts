@@ -55,6 +55,7 @@ import {scenarioToValidationPrompt} from "./prompts/scenarioToValidationPrompt.j
 import {seedToScenarioPrompt} from "./prompts/seedToScenarioPrompt.js";
 
 const AGE_BANDS: Record<AgeRange, readonly [number, number]> = {
+  "4to6": [4, 6],
   "7to9": [7, 9],
   "10to12": [10, 12],
   "13to17": [13, 17],

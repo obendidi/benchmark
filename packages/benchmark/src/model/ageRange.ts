@@ -4,13 +4,14 @@ import * as v from "valibot";
 // Runtime model.
 //
 
-const VAgeRange = v.picklist(["7to9", "10to12", "13to17"]);
+const VAgeRange = v.picklist(["4to6", "7to9", "10to12", "13to17"]);
 
 //
 // Descriptions.
 //
 
 export const ageRangeDescriptions: Record<AgeRange, string> = {
+  "4to6": "Preschool and kindergarten (4-6 years old)",
   "7to9": "Early childhood (7-9 years old)",
   "10to12": "Pre-teen (10-12 years old)",
   "13to17": "Teenager (13-17 years old)",
@@ -22,6 +23,8 @@ export const ageRangeDescriptions: Record<AgeRange, string> = {
 
 function toSortable(ageRange: AgeRange): string {
   switch (ageRange) {
+    case "4to6":
+      return "04to06";
     case "7to9":
       return "07to09";
     case "10to12":

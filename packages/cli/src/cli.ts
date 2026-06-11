@@ -137,7 +137,7 @@ program
   )
   .option(
     "--age-ranges <ranges>",
-    "comma-separated age ranges to generate seeds for (7to9, 10to12, 13to17)",
+    `comma-separated age ranges to generate seeds for (${AgeRange.list.join(", ")})`,
     AgeRange.list.join(",")
   )
   .option(

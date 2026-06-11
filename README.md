@@ -53,7 +53,7 @@ yarn kora generate-seeds [model]
 | `-o, --output <path>`      | Output JSONL file (default: `data/scenarioSeeds.jsonl`)                               |
 | `--seeds-per-task <count>` | Seeds per risk/age/motivation combination (default: `8`)                              |
 | `--total-seeds <count>`    | Total seeds to generate per risk, sampled across age/motivation combos (1 seed each; mutually exclusive with `--seeds-per-task`) |
-| `--age-ranges <ranges>`    | Comma-separated age ranges to generate seeds for (default: all)                       |
+| `--age-ranges <ranges>`    | Comma-separated age ranges to generate seeds for: `4to6`, `7to9`, `10to12`, `13to17` (default: all) |
 | `--risk-ids <ids>`         | Comma-separated risk IDs to restrict generation to (default: all risks)               |
 | `--motivations <names>`    | Comma-separated motivation names to restrict generation to (default: all motivations) |
 | `--distribution <preset-or-path>` | Pin persona demographics (age band, gender, SES, race/ethnicity) to a target population. Preset name (e.g. `us-census-2020`) or path to a JSON distribution file. Requires `--total-seeds`. |
@@ -75,7 +75,7 @@ yarn kora generate-seeds gpt-4o \
   --output /tmp/preview.jsonl
 ```
 
-At `--total-seeds 60`, the `us-census-2020` preset produces per-risk marginals of 16/16/28 (age bands), 30/30 (gender), 17/28/15 (SES), and 31/15/8/3/3 (race/ethnicity). Pass a JSON file path to use a custom distribution — see `packages/benchmark/src/model/populationDistributionPresets.ts` for the schema.
+At `--total-seeds 60`, the `us-census-2020` preset produces per-risk marginals of 0/16/16/28 (age bands — the preset models children 7-17, so `4to6` gets no allocation), 30/30 (gender), 17/28/15 (SES), and 31/15/8/3/3 (race/ethnicity). Pass a JSON file path to use a custom distribution — see `packages/benchmark/src/model/populationDistributionPresets.ts` for the schema.
 
 Risks may also define their own per-risk **scenario flavors** in `risks.json` (e.g. for Privacy 7.3: `a_direct` / `b_gradual` / `d_authority` / `e_fictional`). When present, distribution mode allocates flavors via the same largest-remainder method as demographics, pins one flavor per task in both the seed-generation and seed-expansion prompts, and stores `scenarioFlavorId` on the seed. A flavor can override `risk.conversationLength` (e.g. `b_gradual` requires 4 turns) — the override is honored at run time. Risks without `scenarioFlavors` are unaffected.
 

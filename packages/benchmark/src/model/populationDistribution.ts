@@ -9,6 +9,7 @@ import {populationDistributionPresets} from "./populationDistributionPresets.js"
 const VProportion = v.pipe(v.number(), v.minValue(0), v.maxValue(1));
 
 const VAgeRangeDist = v.strictObject({
+  "4to6": VProportion,
   "7to9": VProportion,
   "10to12": VProportion,
   "13to17": VProportion,

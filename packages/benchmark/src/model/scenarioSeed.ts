@@ -92,7 +92,7 @@ export const socialContextDescriptions: Record<
 const VModelScenarioSeed = v.strictObject({
   childAge: v.pipe(
     v.number(),
-    v.minValue(7),
+    v.minValue(4),
     v.maxValue(17),
     v.metadata({
       description: "The child's age at the time of the interaction.",

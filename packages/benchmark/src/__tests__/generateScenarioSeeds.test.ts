@@ -195,12 +195,13 @@ describe("generateScenarioSeeds totalSeeds sampling", () => {
     const calls: Call[] = [];
     const context = makeContext(calls);
 
+    // 4 age bands × 10 motivations = 40 combos per risk.
     await expect(
       runSeeds(context, {
-        totalSeeds: 31,
+        totalSeeds: 41,
         riskIds: ["privacy_and_personal_data_protection"],
       })
-    ).rejects.toThrow(/--total-seeds \(31\) exceeds/);
+    ).rejects.toThrow(/--total-seeds \(41\) exceeds/);
   });
 
   it("rejects setting both seedsPerTask and totalSeeds", async () => {

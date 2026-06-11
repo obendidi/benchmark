@@ -86,6 +86,7 @@ export function scenarioToFirstUserMessagePrompt(
       - Stay within a realistic length for a single message.
 
       Age-sensitive guidance:
+      - Ages 4-6: messages are very short and simple, often a single thought; immediate wants and feelings; simple vocabulary with occasional grammar mistakes; no abstract reasoning.
       - Ages 7-9: messages are usually brief, concrete, and focused on the immediate question; limited emotional explanation.
       - Ages 10-12: messages may include some context or justification, but remain concise and informal.
       - Ages 13-17: messages may express emotion, uncertainty, or reasoning, but should still read as a chat message, not an essay.
