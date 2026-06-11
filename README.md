@@ -267,7 +267,7 @@ Four provider families can bypass the gateway entirely (`resolveDirectModel` in 
 | -------------- | ---------------- | --------------- |
 | `openai/`      | `@ai-sdk/openai` | `OPENAI_API_KEY` |
 | `anthropic/`   | `@ai-sdk/anthropic` | `ANTHROPIC_API_KEY` |
-| `google/`      | `@ai-sdk/google` | `GOOGLE_GENERATIVE_AI_API_KEY` |
+| `google/`      | `@ai-sdk/google` | `GEMINI_API_KEY` |
 | `deepinfra/`   | `@ai-sdk/deepinfra` (OpenAI-compatible completions API) | `DEEPINFRA_API_KEY` |
 
 Direct routing applies to **every** model role (run target, seed generation, expansion, user simulation, judges). Model ids may themselves contain slashes — e.g. `{"qwen3-32b": {"model": "deepinfra/Qwen/Qwen3-32B"}}` — the provider segment is everything before the first `/`. Direct calls also sidestep the gateway's structured-output corruption, so native JSON mode is used for all providers.

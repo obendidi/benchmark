@@ -1,6 +1,6 @@
 import {anthropic} from "@ai-sdk/anthropic";
 import {deepinfra} from "@ai-sdk/deepinfra";
-import {google} from "@ai-sdk/google";
+import {createGoogleGenerativeAI} from "@ai-sdk/google";
 import {openai} from "@ai-sdk/openai";
 import {ModelRequest, TypedModelRequest} from "@korabench/core";
 import {toJsonSchema} from "@valibot/to-json-schema";
@@ -32,7 +32,7 @@ export interface ModelOptions {
 //
 //     openai     → OPENAI_API_KEY
 //     anthropic  → ANTHROPIC_API_KEY
-//     google     → GOOGLE_GENERATIVE_AI_API_KEY
+//     google     → GEMINI_API_KEY
 //     deepinfra  → DEEPINFRA_API_KEY (OpenAI-compatible completions API)
 //
 // Otherwise the same slug falls back to the gateway — which keys you export
@@ -48,7 +48,13 @@ interface DirectProvider {
 const DIRECT_PROVIDERS: Record<string, DirectProvider> = {
   openai: {envVar: "OPENAI_API_KEY", factory: openai},
   anthropic: {envVar: "ANTHROPIC_API_KEY", factory: anthropic},
-  google: {envVar: "GOOGLE_GENERATIVE_AI_API_KEY", factory: google},
+  google: {
+    envVar: "GEMINI_API_KEY",
+    // @ai-sdk/google's default instance reads GOOGLE_GENERATIVE_AI_API_KEY;
+    // pass the key explicitly so GEMINI_API_KEY is the single source.
+    factory: id =>
+      createGoogleGenerativeAI({apiKey: process.env.GEMINI_API_KEY})(id),
+  },
   deepinfra: {envVar: "DEEPINFRA_API_KEY", factory: deepinfra},
 };
 

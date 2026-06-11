@@ -26,7 +26,7 @@ describe("resolveDirectModel", () => {
 
   it("routes each provider segment off its own env var", () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "test-key");
-    vi.stubEnv("GOOGLE_GENERATIVE_AI_API_KEY", "");
+    vi.stubEnv("GEMINI_API_KEY", "");
     expect(
       resolveDirectModel({model: "anthropic/claude-sonnet-4-6"})
     ).toBeDefined();
