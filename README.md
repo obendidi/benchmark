@@ -259,6 +259,19 @@ Models are configured in a `models.json` file at the project root. The CLI searc
 
 Authentication is handled via the `AI_GATEWAY_API_KEY` environment variable.
 
+### Direct provider models
+
+Four provider families can bypass the gateway entirely (`resolveDirectModel` in `packages/cli/src/models/gatewayModel.ts`): when a `models.json` entry's `model` field starts with one of these provider segments **and** the provider's API key is set in the environment, the model is served directly by the AI SDK provider package. With the key unset, the same slug falls back to the AI Gateway — which keys you export decides the routing, per provider. Both routes share the same request and retry plumbing; only the underlying language model differs.
+
+| `model` prefix | Provider package | API key env var |
+| -------------- | ---------------- | --------------- |
+| `openai/`      | `@ai-sdk/openai` | `OPENAI_API_KEY` |
+| `anthropic/`   | `@ai-sdk/anthropic` | `ANTHROPIC_API_KEY` |
+| `google/`      | `@ai-sdk/google` | `GOOGLE_GENERATIVE_AI_API_KEY` |
+| `deepinfra/`   | `@ai-sdk/deepinfra` (OpenAI-compatible completions API) | `DEEPINFRA_API_KEY` |
+
+Direct routing applies to **every** model role (run target, seed generation, expansion, user simulation, judges). Model ids may themselves contain slashes — e.g. `{"qwen3-32b": {"model": "deepinfra/Qwen/Qwen3-32B"}}` — the provider segment is everything before the first `/`. Direct calls also sidestep the gateway's structured-output corruption, so native JSON mode is used for all providers.
+
 ### Custom models
 
 Model slugs that start with `custom-` bypass the AI SDK gateway and are routed to `packages/cli/src/models/customModel.ts`. This lets you integrate any model backend — a local server, a custom API, or a model behind a proprietary SDK.
@@ -312,7 +325,7 @@ The slug suffix decides the routing (see `packages/cli/src/models/customModel.ts
 | ----------------------------- | --------------- | ----------------------- | -------------------- | ---------------------- |
 | `kora-app-<name>-android`     | `native-runner` | `http://localhost:7200` | `NATIVE_RUNNER_URL`  | `NATIVE_RUNNER_API_KEY` |
 | `kora-app-<name>` (no suffix) | `web-runner`    | `http://localhost:7100` | `WEB_RUNNER_URL`     | `WEB_RUNNER_API_KEY`   |
-| anything else                 | AI Gateway      | n/a                     | n/a                  | `AI_GATEWAY_API_KEY`   |
+| anything else                 | AI Gateway — or the provider's AI SDK package when its key is set (see [Direct provider models](#direct-provider-models)) | n/a | n/a | `AI_GATEWAY_API_KEY` or the provider's key |
 
 Both runners live in `../kora-apps`. Set up that repo once: `yarn install` and `cp .env.example .env`.
 

@@ -5,6 +5,31 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
+"@ai-sdk/anthropic@npm:^3.0.82":
+  version: 3.0.82
+  resolution: "@ai-sdk/anthropic@npm:3.0.82"
+  dependencies:
+    "@ai-sdk/provider": "npm:3.0.10"
+    "@ai-sdk/provider-utils": "npm:4.0.27"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/1bfb8ebc4f003357a1b0dcfa16b985f683de67327f66a00cc7f4645d51af099222d52987bf1868025281fccefe6070503e75fa7deb4264502f818b0a3550aea1
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/deepinfra@npm:^2.0.52":
+  version: 2.0.52
+  resolution: "@ai-sdk/deepinfra@npm:2.0.52"
+  dependencies:
+    "@ai-sdk/openai-compatible": "npm:2.0.48"
+    "@ai-sdk/provider": "npm:3.0.10"
+    "@ai-sdk/provider-utils": "npm:4.0.27"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/cde23d9833a82b4618209a86a059a7b9e624998cde6c0950b6fcbebdb00f4d522e832c61026d6d0c36de221356e9b401fd8d151461fd311dc38003a50aebb3fa
+  languageName: node
+  linkType: hard
+
 "@ai-sdk/gateway@npm:3.0.41":
   version: 3.0.41
   resolution: "@ai-sdk/gateway@npm:3.0.41"
@@ -18,6 +43,42 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ai-sdk/google@npm:^3.0.80":
+  version: 3.0.80
+  resolution: "@ai-sdk/google@npm:3.0.80"
+  dependencies:
+    "@ai-sdk/provider": "npm:3.0.10"
+    "@ai-sdk/provider-utils": "npm:4.0.27"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/304f4fac8b28f0806df7e17b8aed8708e5a0be3ecef1e584b51b354890f8b0db800267f7321e993887066af3b580ad93b284172e4a41488efae56e50f5046d96
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/openai-compatible@npm:2.0.48":
+  version: 2.0.48
+  resolution: "@ai-sdk/openai-compatible@npm:2.0.48"
+  dependencies:
+    "@ai-sdk/provider": "npm:3.0.10"
+    "@ai-sdk/provider-utils": "npm:4.0.27"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/34dcc10fe8652e6a50d1f1832302b87132528b4785e39f9b3129c84a26919c18b07e60f8547e3b6873b69a3ba462d4943d50160a057769ad7c026067388ef463
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/openai@npm:^3.0.69":
+  version: 3.0.69
+  resolution: "@ai-sdk/openai@npm:3.0.69"
+  dependencies:
+    "@ai-sdk/provider": "npm:3.0.10"
+    "@ai-sdk/provider-utils": "npm:4.0.27"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/3699089c1d9a91806b1ca7c584c547640ae69a5982444e855e5b78af52a26b37aa9c293e76905c29f63d5b5f6629a2c9057d660948db4c6d6f4cf4d6b2244b74
+  languageName: node
+  linkType: hard
+
 "@ai-sdk/provider-utils@npm:4.0.14":
   version: 4.0.14
   resolution: "@ai-sdk/provider-utils@npm:4.0.14"
@@ -28,6 +89,28 @@ __metadata:
   peerDependencies:
     zod: ^3.25.76 || ^4.1.8
   checksum: 10c0/613ec8c9efb2b3a5fd0083319e0e54e66737c071a0a7957be8248a23533325ba7a26149393a850a8e38c01bf62fe706f776687e01c3513d7558475a2856ca06e
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/provider-utils@npm:4.0.27":
+  version: 4.0.27
+  resolution: "@ai-sdk/provider-utils@npm:4.0.27"
+  dependencies:
+    "@ai-sdk/provider": "npm:3.0.10"
+    "@standard-schema/spec": "npm:^1.1.0"
+    eventsource-parser: "npm:^3.0.8"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/2202dedcbe8f58883ef37425111392c6b5b5c2f85dfbbd11b13173e9d349da3d977ba610586c4b5412720e07b09f63ba0e88dbc6e21f043441a67f6d51225020
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/provider@npm:3.0.10":
+  version: 3.0.10
+  resolution: "@ai-sdk/provider@npm:3.0.10"
+  dependencies:
+    json-schema: "npm:^0.4.0"
+  checksum: 10c0/c9b162165c3fd4684e4f7a1c041db3ad75785c841d904bac577006b7b2299d1b465557b1d32e3f59b6d8536a0ef5741b195aad86fc3e0e1d2a39f077062a83c4
   languageName: node
   linkType: hard
 
@@ -615,6 +698,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@korabench/cli@workspace:packages/cli"
   dependencies:
+    "@ai-sdk/anthropic": "npm:^3.0.82"
+    "@ai-sdk/deepinfra": "npm:^2.0.52"
+    "@ai-sdk/google": "npm:^3.0.80"
+    "@ai-sdk/openai": "npm:^3.0.69"
     "@commander-js/extra-typings": "npm:14.0.0"
     "@korabench/benchmark": "workspace:*"
     "@korabench/core": "npm:^1.0.6"
@@ -2323,6 +2410,13 @@ __metadata:
   version: 3.0.6
   resolution: "eventsource-parser@npm:3.0.6"
   checksum: 10c0/70b8ccec7dac767ef2eca43f355e0979e70415701691382a042a2df8d6a68da6c2fca35363669821f3da876d29c02abe9b232964637c1b6635c940df05ada78a
+  languageName: node
+  linkType: hard
+
+"eventsource-parser@npm:^3.0.8":
+  version: 3.1.0
+  resolution: "eventsource-parser@npm:3.1.0"
+  checksum: 10c0/5ab4c6c9a2a042be0b387b6d03810eb580bac4ce90e299ede56458125a97ffe3af8145b2740089fc898a96cfa5aae792ee79f2a06257fba2776b0e7bce037071
   languageName: node
   linkType: hard
 
