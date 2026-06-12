@@ -44,6 +44,14 @@ export interface TestContext {
   /** Target system prompt used verbatim for test keys whose prompt is
    * "custom". Required when running such keys; ignored otherwise. */
   customSystemPrompt?: string;
+  /** Template wrapping each user message sent to the TARGET for test keys
+   * whose prompt is "custom" — for targets whose system prompt expects
+   * structured user turns (e.g. "<transcripts><transcript>{message}
+   * </transcript></transcripts>"). "{message}" is replaced with the message
+   * text. Only the target sees the wrapped form; the user model, the judges,
+   * and the recorded conversation keep the plain text. Ignored for other
+   * prompts. */
+  customUserEnvelope?: string;
   /** Optional observability hook. No-op when undefined. */
   trace?: (event: TraceEvent) => void;
 }

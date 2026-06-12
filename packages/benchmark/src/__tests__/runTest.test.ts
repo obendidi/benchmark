@@ -48,7 +48,8 @@ function createMockJudgeModel(): MockJudgeModel {
 }
 
 function createTestContext(
-  customSystemPrompt?: string
+  customSystemPrompt?: string,
+  customUserEnvelope?: string
 ): TestContext & {judgeModel: MockJudgeModel} {
   const judgeModel = createMockJudgeModel();
   return {
@@ -64,6 +65,7 @@ function createTestContext(
     ),
     judgeModels: {"test-judge": judgeModel},
     customSystemPrompt,
+    customUserEnvelope,
     judgeModel,
   };
 }
@@ -194,6 +196,71 @@ describe("kora.runTest", () => {
     const systemMessage = assistantSystemMessage(context);
     expect(systemMessage.content).not.toContain(
       "You are the product assistant."
+    );
+  });
+
+  const envelope = "<transcripts><transcript>{message}</transcript></transcripts>";
+
+  it("custom key wraps every user message the target sees in the envelope", async () => {
+    const context = createTestContext("You are the product assistant.", envelope);
+
+    await kora.runTest(context, scenario, customKey);
+
+    // Last turn's request carries the whole conversation so far.
+    const calls = vi.mocked(context.getAssistantResponse).mock.calls;
+    const request = calls[calls.length - 1]![0];
+    const userMessages = request.messages.filter(m => m.role === "user");
+    expect(userMessages.length).toBeGreaterThan(1);
+    expect(userMessages[0]!.content).toBe(
+      `<transcripts><transcript>${scenario.firstUserMessage}</transcript></transcripts>`
+    );
+    for (const message of userMessages) {
+      expect(message.content).toMatch(
+        /^<transcripts><transcript>.*<\/transcript><\/transcripts>$/
+      );
+    }
+  });
+
+  it("the envelope is target-only: user model, judges, and recorded messages see plain text", async () => {
+    const context = createTestContext("You are the product assistant.", envelope);
+
+    const result = await kora.runTest(context, scenario, customKey);
+
+    for (const message of result.messages) {
+      expect(message.content).not.toContain("<transcript");
+    }
+    for (const [request] of vi.mocked(context.getUserResponse).mock.calls) {
+      expect(JSON.stringify(request)).not.toContain("<transcript");
+    }
+    for (const [request] of context.judgeModel.getResponse.mock.calls) {
+      expect(JSON.stringify(request)).not.toContain("<transcript");
+    }
+  });
+
+  it("non-custom keys ignore the context's custom user envelope", async () => {
+    const context = createTestContext("You are the product assistant.", envelope);
+
+    await kora.runTest(context, scenario, defaultKey);
+
+    for (const [request] of vi.mocked(context.getAssistantResponse).mock
+      .calls) {
+      expect(JSON.stringify(request)).not.toContain("<transcript");
+    }
+  });
+
+  it("envelope wrapping does not mangle replacement patterns ($&) in message text", async () => {
+    const context = createTestContext("You are the product assistant.", envelope);
+    vi.mocked(context.getUserResponse).mockResolvedValue({
+      output: "I paid $& and $' for it.",
+    });
+
+    await kora.runTest(context, scenario, customKey);
+
+    const calls = vi.mocked(context.getAssistantResponse).mock.calls;
+    const request = calls[calls.length - 1]![0];
+    const lastUserMessage = request.messages.filter(m => m.role === "user").at(-1)!;
+    expect(lastUserMessage.content).toBe(
+      "<transcripts><transcript>I paid $& and $' for it.</transcript></transcripts>"
     );
   });
 

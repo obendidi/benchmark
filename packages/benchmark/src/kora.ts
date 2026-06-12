@@ -450,6 +450,8 @@ export const kora = Benchmark.new({
     }
     const customSystemPrompt =
       prompt === "custom" ? c.customSystemPrompt : undefined;
+    const customUserEnvelope =
+      prompt === "custom" ? c.customUserEnvelope : undefined;
 
     if (startMessages && startMessages.length % 2 !== 0) {
       throw new Error(
@@ -496,13 +498,27 @@ export const kora = Benchmark.new({
           modelMemory: scenario.modelMemory,
           customSystemPrompt,
         });
+        // The envelope applies only to what the target sees: `messages` (read
+        // by the user model, the judges, and the recorded conversation) stays
+        // plain. The function replacement keeps "$"-patterns in message text
+        // from being interpreted as String.replace substitutions.
         const {output} = await c.getAssistantResponse({
           messages: [
             {
               role: "system",
               content: modelPrompt.input,
             },
-            ...messages,
+            ...messages.map(m =>
+              m.role === "user" && customUserEnvelope !== undefined
+                ? {
+                    ...m,
+                    content: customUserEnvelope.replace(
+                      "{message}",
+                      () => m.content
+                    ),
+                  }
+                : m
+            ),
           ],
         });
         return output;

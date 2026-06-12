@@ -101,6 +101,10 @@ export interface ContinueCommandOptions {
   /** Target system prompt used verbatim for records whose prompt is "custom".
    * Required when the input contains such records. */
   customSystemPrompt?: string;
+  /** Template wrapping each user message sent to the target for records whose
+   * prompt is "custom"; "{message}" is replaced with the message text. See
+   * TestContext.customUserEnvelope. */
+  customUserEnvelope?: string;
 }
 
 export async function continueCommand(
@@ -277,7 +281,8 @@ export async function continueCommand(
           task.input.modelId,
           getTargetGateway(task.input.modelId),
           task.input.scenario,
-          options.customSystemPrompt
+          options.customSystemPrompt,
+          options.customUserEnvelope
         );
         const testResult = await kora.runTest(
           built.context,

@@ -164,6 +164,33 @@
   "gpt-oss-120b": {
     "model": "cerebras/gpt-oss-120b"
   },
+  "gpt-oss-120b:high": {
+    "model": "cerebras/gpt-oss-120b",
+    "maxTokens": 26000,
+    "providerOptions": {
+      "cerebras": {
+        "reasoningEffort": "high"
+      }
+    }
+  },
+  "gpt-oss-120b:medium": {
+    "model": "cerebras/gpt-oss-120b",
+    "maxTokens": 26000,
+    "providerOptions": {
+      "cerebras": {
+        "reasoningEffort": "medium"
+      }
+    }
+  },
+  "gpt-oss-120b:low": {
+    "model": "cerebras/gpt-oss-120b",
+    "maxTokens": 26000,
+    "providerOptions": {
+      "cerebras": {
+        "reasoningEffort": "low"
+      }
+    }
+  },
   "gpt-5.4:thinking:limited": {
     "model": "openai/gpt-5.4",
     "maxTokens": 26000,

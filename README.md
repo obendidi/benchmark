@@ -127,6 +127,7 @@ yarn kora run <target-model> [user-model]
 | `-o, --output <path>` | Output results JSON file (default: `data/results.json`)                                                            |
 | `--prompts <prompts>` | Comma-separated prompt variants to test: `default`, `child`, `custom` (default: `default`)                         |
 | `--custom-prompt <prompt>` | Target system prompt used verbatim for the `custom` variant — e.g. to compare your own product prompt against the built-in ones. Required when `--prompts` includes `custom`. Pass a file with `--custom-prompt "$(cat my-prompt.md)"`. |
+| `--custom-user-envelope <template>` | Template wrapping each user message sent to the target for the `custom` variant, for system prompts that expect structured user turns; `{message}` is replaced with the message text (e.g. `"<transcript>{message}</transcript>"`). Target-only: the user model, the judges, and the recorded conversation keep the plain text. Requires `--custom-prompt`. |
 | `--risk-ids <ids>`    | Comma-separated risk IDs to restrict the run to (default: all scenarios in the input file)                         |
 | `--limit <count>`     | Maximum number of test tasks to run — useful for smoke tests                                                       |
 | `--concurrency <n>`   | Max test tasks run in parallel (default: 10; use 1 for a single shared app account, e.g. `kora-app-*`)             |
@@ -189,6 +190,7 @@ yarn kora continue [user-model]
 | `--target-models <ids>`    | Comma-separated target `modelId`s to restrict the run to (default: all `modelId`s in the input file)                                                                                       |
 | `--limit-per-risk <count>` | Maximum records per risk, selected deterministically by `id` (sorted lexicographically). Fails fast if any requested risk has fewer records than requested.                                |
 | `--custom-prompt <prompt>` | Target system prompt for records whose `prompt` is `custom` (same semantics as `run`)                                                                                                      |
+| `--custom-user-envelope <template>` | Template wrapping each user message sent to the target for records whose `prompt` is `custom` (same semantics as `run`)                                                            |
 
 Each record is replayed with its **original** `modelId` as the target model, so 3-turn-vs-longer comparisons stay apples-to-apples per (scenario, model). The turn budget comes from `risk.conversationLength` in `packages/benchmark/data/risks.json`; records whose transcripts already meet or exceed the risk's length are re-judged without adding new turns.
 
@@ -576,7 +578,7 @@ Scores are grouped by risk category, risk, age range, and prompt variant. Three 
 - **`child`** — the system prompt includes the child's age range.
 - **`custom`** — the system prompt passed via `--custom-prompt`, used verbatim.
 
-Use `--prompts default,child` to test both built-in variants, or e.g. `--prompts child,custom --custom-prompt "$(cat my-prompt.md)"` to compare your own system prompt against the built-in child prompt on identical scenarios.
+Use `--prompts default,child` to test both built-in variants, or e.g. `--prompts child,custom --custom-prompt "$(cat my-prompt.md)"` to compare your own system prompt against the built-in child prompt on identical scenarios. If your prompt expects structured user turns (e.g. an XML transcript envelope), add `--custom-user-envelope "<transcript>{message}</transcript>"` — only the target sees the wrapped form.
 
 ## Cost and duration
 

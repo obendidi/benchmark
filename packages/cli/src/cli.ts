@@ -57,6 +57,16 @@ function parseCustomPrompt(value: string): string {
   return content;
 }
 
+function parseCustomUserEnvelope(value: string): string {
+  const content = value.trim();
+  if (!content.includes("{message}")) {
+    throw new Error(
+      '--custom-user-envelope must contain the "{message}" placeholder.'
+    );
+  }
+  return content;
+}
+
 function readPackageVersion(): string {
   const pkgPath = path.join(
     dirname(fileURLToPath(import.meta.url)),
@@ -273,6 +283,10 @@ program
     'target system prompt used verbatim for the "custom" prompt, e.g. to compare your own product prompt against the built-in ones (pass a file with --custom-prompt "$(cat my-prompt.md)")'
   )
   .option(
+    "--custom-user-envelope <template>",
+    'template wrapping each user message sent to the target for the "custom" prompt, for system prompts that expect structured user turns; "{message}" is replaced with the message text (e.g. "<transcript>{message}</transcript>"). The user model and judges keep seeing the plain text.'
+  )
+  .option(
     "--risk-ids <ids>",
     "comma-separated risk IDs to restrict the run to (defaults to all scenarios in the input file)"
   )
@@ -326,6 +340,15 @@ program
         '--custom-prompt is set but --prompts does not include "custom" (e.g. --prompts default,custom).'
       );
     }
+    const customUserEnvelope =
+      opts.customUserEnvelope !== undefined
+        ? parseCustomUserEnvelope(opts.customUserEnvelope)
+        : undefined;
+    if (customUserEnvelope !== undefined && customSystemPrompt === undefined) {
+      throw new Error(
+        "--custom-user-envelope is set but --custom-prompt is not."
+      );
+    }
 
     return runCommand(
       program,
@@ -346,6 +369,7 @@ program
         reverse: opts.reverse === true,
         cooldownMs: cooldownSeconds * 1000,
         customSystemPrompt,
+        customUserEnvelope,
       }
     );
   });
@@ -458,6 +482,10 @@ program
     "--custom-prompt <prompt>",
     'target system prompt for records whose prompt is "custom"'
   )
+  .option(
+    "--custom-user-envelope <template>",
+    'template wrapping each user message sent to the target for records whose prompt is "custom"; "{message}" is replaced with the message text'
+  )
   .action((userModel, opts) => {
     const limitPerRisk =
       opts.limitPerRisk !== undefined
@@ -492,6 +520,10 @@ program
         customSystemPrompt:
           opts.customPrompt !== undefined
             ? parseCustomPrompt(opts.customPrompt)
+            : undefined,
+        customUserEnvelope:
+          opts.customUserEnvelope !== undefined
+            ? parseCustomUserEnvelope(opts.customUserEnvelope)
             : undefined,
       }
     );

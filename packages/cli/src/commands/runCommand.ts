@@ -164,6 +164,10 @@ export interface RunCommandOptions {
   /** Target system prompt used verbatim for the "custom" prompt arm. Required
    * when prompts includes "custom". */
   customSystemPrompt?: string;
+  /** Template wrapping each user message sent to the target for the "custom"
+   * prompt arm; "{message}" is replaced with the message text. See
+   * TestContext.customUserEnvelope. */
+  customUserEnvelope?: string;
 }
 
 export async function runCommand(
@@ -216,6 +220,9 @@ export async function runCommand(
     console.log(
       `Custom system prompt: ${options.customSystemPrompt.length} character(s).`
     );
+  }
+  if (options.customUserEnvelope !== undefined) {
+    console.log(`Custom user envelope: ${options.customUserEnvelope}`);
   }
   let freshStarted = 0;
 
@@ -293,7 +300,8 @@ export async function runCommand(
           targetModelSlug,
           targetGatewayModel,
           task.scenario,
-          options.customSystemPrompt
+          options.customSystemPrompt,
+          options.customUserEnvelope
         );
 
         let outcome: "completed" | "errored" = "errored";
