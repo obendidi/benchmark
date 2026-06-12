@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, it, vi} from "vitest";
-import {resolveDirectModel} from "../gatewayModel.js";
+import {createGatewayModel, resolveDirectModel} from "../gatewayModel.js";
 
 describe("resolveDirectModel", () => {
   afterEach(() => {
@@ -40,5 +40,35 @@ describe("resolveDirectModel", () => {
     expect(
       resolveDirectModel({model: "deepinfra/Qwen/Qwen3-32B"})
     ).toBeDefined();
+  });
+
+  it("routes cerebras models off CEREBRAS_API_KEY", () => {
+    vi.stubEnv("CEREBRAS_API_KEY", "test-key");
+    expect(resolveDirectModel({model: "cerebras/gpt-oss-120b"})).toBeDefined();
+    vi.stubEnv("CEREBRAS_API_KEY", "");
+    expect(
+      resolveDirectModel({model: "cerebras/gpt-oss-120b"})
+    ).toBeUndefined();
+  });
+});
+
+describe("createGatewayModel with raw direct-provider slugs", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("accepts a raw <provider>/<model> slug without a models.json entry", () => {
+    vi.stubEnv("CEREBRAS_API_KEY", "test-key");
+    // The bogus registry path proves models.json is never read on this path.
+    expect(
+      createGatewayModel("/nonexistent/models.json", "cerebras/gpt-oss-120b")
+    ).toBeDefined();
+  });
+
+  it("fails fast when the raw slug's provider key is missing", () => {
+    vi.stubEnv("CEREBRAS_API_KEY", "");
+    expect(() =>
+      createGatewayModel("/nonexistent/models.json", "cerebras/gpt-oss-120b")
+    ).toThrow(/CEREBRAS_API_KEY/);
   });
 });

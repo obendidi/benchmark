@@ -17,6 +17,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ai-sdk/cerebras@npm:^2.0.55":
+  version: 2.0.55
+  resolution: "@ai-sdk/cerebras@npm:2.0.55"
+  dependencies:
+    "@ai-sdk/openai-compatible": "npm:2.0.49"
+    "@ai-sdk/provider": "npm:3.0.10"
+    "@ai-sdk/provider-utils": "npm:4.0.28"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/b55105c764f454c496ec622931421380e78600e8a2886d53db3d3d5d8db765ad9bb3f76d3301f621b9012485101303aa350d6cbc3af92cb4ba04edbe8639d0cc
+  languageName: node
+  linkType: hard
+
 "@ai-sdk/deepinfra@npm:^2.0.52":
   version: 2.0.52
   resolution: "@ai-sdk/deepinfra@npm:2.0.52"
@@ -67,6 +80,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ai-sdk/openai-compatible@npm:2.0.49":
+  version: 2.0.49
+  resolution: "@ai-sdk/openai-compatible@npm:2.0.49"
+  dependencies:
+    "@ai-sdk/provider": "npm:3.0.10"
+    "@ai-sdk/provider-utils": "npm:4.0.28"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/b9f43c8e3e0b61b1cd3ca944bed9a839a4ea2113f7fc8b6c5fdcd6dcbb9673c4156bb79976110384ae36005c96cd7489bdc73cebd785f6247e7386cc7bd34ea2
+  languageName: node
+  linkType: hard
+
 "@ai-sdk/openai@npm:^3.0.69":
   version: 3.0.69
   resolution: "@ai-sdk/openai@npm:3.0.69"
@@ -102,6 +127,19 @@ __metadata:
   peerDependencies:
     zod: ^3.25.76 || ^4.1.8
   checksum: 10c0/2202dedcbe8f58883ef37425111392c6b5b5c2f85dfbbd11b13173e9d349da3d977ba610586c4b5412720e07b09f63ba0e88dbc6e21f043441a67f6d51225020
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/provider-utils@npm:4.0.28":
+  version: 4.0.28
+  resolution: "@ai-sdk/provider-utils@npm:4.0.28"
+  dependencies:
+    "@ai-sdk/provider": "npm:3.0.10"
+    "@standard-schema/spec": "npm:^1.1.0"
+    eventsource-parser: "npm:^3.0.8"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/5166341ae375acc178b5d113f2165bfb3593a57ac482cbdc4fc066c0d733498e98296d647e4350d2c12f596fd4ff20427d3fed5a34378b5bdefb4373cc998426
   languageName: node
   linkType: hard
 
@@ -699,6 +737,7 @@ __metadata:
   resolution: "@korabench/cli@workspace:packages/cli"
   dependencies:
     "@ai-sdk/anthropic": "npm:^3.0.82"
+    "@ai-sdk/cerebras": "npm:^2.0.55"
     "@ai-sdk/deepinfra": "npm:^2.0.52"
     "@ai-sdk/google": "npm:^3.0.80"
     "@ai-sdk/openai": "npm:^3.0.69"

@@ -121,7 +121,7 @@
     "maxTokens": 26000,
     "providerOptions": {
       "deepinfra": {
-        "chat_template_kwargs": { "thinking": true }
+        "chat_template_kwargs": {"thinking": true}
       }
     }
   },
@@ -160,5 +160,42 @@
   "glm-5:limited": {
     "model": "deepinfra/zai-org/GLM-5",
     "maxTokens": 16000
+  },
+  "gpt-oss-120b": {
+    "model": "cerebras/gpt-oss-120b"
+  },
+  "gpt-5.4:thinking:limited": {
+    "model": "openai/gpt-5.4",
+    "maxTokens": 26000,
+    "providerOptions": {
+      "openai": {
+        "reasoningEffort": "medium"
+      }
+    }
+  },
+  "gemini-3.5-flash:thinking:limited": {
+    "model": "google/gemini-3.5-flash",
+    "maxTokens": 26000,
+    "providerOptions": {
+      "google": {
+        "thinkingConfig": {
+          "thinkingBudget": 8000,
+          "includeThoughts": false
+        }
+      }
+    }
+  },
+  "claude-haiku-4.5:thinking:limited": {
+    "model": "anthropic/claude-haiku-4.5",
+    "maxTokens": 26000,
+    "temperature": 1,
+    "providerOptions": {
+      "anthropic": {
+        "thinking": {
+          "type": "enabled",
+          "budgetTokens": 8000
+        }
+      }
+    }
   }
 }

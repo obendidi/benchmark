@@ -269,8 +269,11 @@ Four provider families can bypass the gateway entirely (`resolveDirectModel` in 
 | `anthropic/`   | `@ai-sdk/anthropic` | `ANTHROPIC_API_KEY` |
 | `google/`      | `@ai-sdk/google` | `GEMINI_API_KEY` |
 | `deepinfra/`   | `@ai-sdk/deepinfra` (OpenAI-compatible completions API) | `DEEPINFRA_API_KEY` |
+| `cerebras/`    | `@ai-sdk/cerebras` (OpenAI-compatible completions API) | `CEREBRAS_API_KEY` |
 
 Direct routing applies to **every** model role (run target, seed generation, expansion, user simulation, judges). Model ids may themselves contain slashes — e.g. `{"qwen3-32b": {"model": "deepinfra/Qwen/Qwen3-32B"}}` — the provider segment is everything before the first `/`. Direct calls also sidestep the gateway's structured-output corruption, so native JSON mode is used for all providers.
+
+Raw `<provider>/<model>` slugs can also be used **directly on the command line** without a `models.json` entry (e.g. `yarn kora run cerebras/gpt-oss-120b`) — the provider's key must be set (there is no gateway fallback for these), and no per-model defaults (`maxTokens`, `temperature`, `providerOptions`) apply. Add a registry entry when you want those defaults.
 
 ### Custom models
 

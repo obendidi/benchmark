@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.82",
+    "@ai-sdk/cerebras": "^2.0.55",
     "@ai-sdk/deepinfra": "^2.0.52",
     "@ai-sdk/google": "^3.0.80",
     "@ai-sdk/openai": "^3.0.69",

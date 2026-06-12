@@ -1,4 +1,5 @@
 import {anthropic} from "@ai-sdk/anthropic";
+import {cerebras} from "@ai-sdk/cerebras";
 import {deepinfra} from "@ai-sdk/deepinfra";
 import {createGoogleGenerativeAI} from "@ai-sdk/google";
 import {openai} from "@ai-sdk/openai";
@@ -34,6 +35,7 @@ export interface ModelOptions {
 //     anthropic  → ANTHROPIC_API_KEY
 //     google     → GEMINI_API_KEY
 //     deepinfra  → DEEPINFRA_API_KEY (OpenAI-compatible completions API)
+//     cerebras   → CEREBRAS_API_KEY (OpenAI-compatible completions API)
 //
 // Otherwise the same slug falls back to the gateway — which keys you export
 // decides the routing, per provider. Both routes share the request/retry
@@ -56,6 +58,7 @@ const DIRECT_PROVIDERS: Record<string, DirectProvider> = {
       createGoogleGenerativeAI({apiKey: process.env.GEMINI_API_KEY})(id),
   },
   deepinfra: {envVar: "DEEPINFRA_API_KEY", factory: deepinfra},
+  cerebras: {envVar: "CEREBRAS_API_KEY", factory: cerebras},
 };
 
 /**
@@ -133,11 +136,26 @@ export function createGatewayModel(
   modelSlug: string,
   options?: ModelOptions
 ): Model {
-  const config = resolveModelConfig(modelsJsonPath, modelSlug);
+  // Slugs that name a direct provider explicitly (e.g. "cerebras/gpt-oss-120b",
+  // "deepinfra/Qwen/Qwen3-32B") work without a models.json entry — but then no
+  // per-model defaults (maxTokens, temperature, providerOptions) apply. Registry
+  // slugs (e.g. "gpt-4o:extended") get their configured defaults as before.
+  const directPrefix = Object.keys(DIRECT_PROVIDERS).find(p =>
+    modelSlug.startsWith(`${p}/`)
+  );
+  const config = directPrefix
+    ? {model: modelSlug}
+    : resolveModelConfig(modelsJsonPath, modelSlug);
 
   // Env-driven routing: direct provider package when its key is set, gateway
   // otherwise. Same slug, same plumbing — only the LanguageModel differs.
   const directModel = resolveDirectModel(config);
+  if (directPrefix && !directModel) {
+    throw new Error(
+      `Model "${modelSlug}" names a direct provider but ` +
+        `${DIRECT_PROVIDERS[directPrefix]!.envVar} is not set.`
+    );
+  }
   const model: LanguageModel = directModel ?? gateway(config.model);
 
   const retryOptions = buildRetryOptions(config.model, options);
