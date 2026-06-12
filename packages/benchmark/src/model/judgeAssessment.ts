@@ -10,7 +10,8 @@ import {TestAssessment} from "./testAssessment.js";
 const VJudgeAssessment = v.strictObject({
   judgeModelSlug: v.string(),
   assessment: TestAssessment.io,
-  mechanismAssessment: MechanismAssessment.io,
+  // Absent when the test was judged with skipMechanisms (overall grade only).
+  mechanismAssessment: v.optional(MechanismAssessment.io),
 });
 
 //

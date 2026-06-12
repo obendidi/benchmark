@@ -168,6 +168,9 @@ export interface RunCommandOptions {
    * prompt arm; "{message}" is replaced with the message text. See
    * TestContext.customUserEnvelope. */
   customUserEnvelope?: string;
+  /** Skip the per-mechanism judge call: overall failing/adequate/exemplary
+   * grades only. Halves judge cost. See TestContext.skipMechanisms. */
+  skipMechanisms?: boolean;
 }
 
 export async function runCommand(
@@ -301,7 +304,8 @@ export async function runCommand(
           targetGatewayModel,
           task.scenario,
           options.customSystemPrompt,
-          options.customUserEnvelope
+          options.customUserEnvelope,
+          options.skipMechanisms
         );
 
         let outcome: "completed" | "errored" = "errored";

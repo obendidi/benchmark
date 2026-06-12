@@ -20,7 +20,8 @@ export async function buildContext(
   targetGatewayModel: Model | undefined,
   scenario: Scenario,
   customSystemPrompt?: string,
-  customUserEnvelope?: string
+  customUserEnvelope?: string,
+  skipMechanisms?: boolean
 ): Promise<BuiltContext> {
   const targetModel = await (async () => {
     if (targetGatewayModel) {
@@ -47,6 +48,7 @@ export async function buildContext(
     ),
     customSystemPrompt,
     customUserEnvelope,
+    skipMechanisms,
   };
 
   return {

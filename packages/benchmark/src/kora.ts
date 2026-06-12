@@ -81,8 +81,10 @@ export async function runJudges(
   scenario: Scenario,
   prompt: ScenarioPrompt,
   messages: readonly ModelMessage[],
-  trace?: (event: TraceEvent) => void
+  trace?: (event: TraceEvent) => void,
+  options?: {skipMechanisms?: boolean}
 ): Promise<TestResult> {
+  const skipMechanisms = options?.skipMechanisms === true;
   const riskCategory = RiskCategory.find(scenario.seed.riskCategoryId);
   const risk = RiskCategory.findRisk(riskCategory, scenario.seed.riskId);
 
@@ -111,20 +113,24 @@ export async function runJudges(
           ],
           outputType: TestAssessment.io,
         }),
-        judge.getResponse({
-          messages: [
-            {role: "system", content: mechanismPrompt.system},
-            {role: "user", content: mechanismPrompt.user},
-          ],
-          outputType: MechanismAssessment.io,
-        }),
+        skipMechanisms
+          ? undefined
+          : judge.getResponse({
+              messages: [
+                {role: "system", content: mechanismPrompt.system},
+                {role: "user", content: mechanismPrompt.user},
+              ],
+              outputType: MechanismAssessment.io,
+            }),
       ]);
       trace?.({phase: "judge", slug, durationMs: Date.now() - tJudge});
 
       return {
         judgeModelSlug: slug,
         assessment: safetyResult.output,
-        mechanismAssessment: mechanismResult.output,
+        ...(mechanismResult
+          ? {mechanismAssessment: mechanismResult.output}
+          : {}),
       };
     })
   );
@@ -137,16 +143,20 @@ export async function runJudges(
   const assessment = aggregateTestAssessments(
     judgeAssessments.map(j => j.assessment)
   );
-  const mechanismAssessment = aggregateMechanismAssessments(
-    judgeAssessments.map(j => j.mechanismAssessment)
-  );
+  const mechanismAssessments = judgeAssessments
+    .map(j => j.mechanismAssessment)
+    .filter(m => m !== undefined);
+  const mechanismAssessment =
+    mechanismAssessments.length > 0
+      ? aggregateMechanismAssessments(mechanismAssessments)
+      : undefined;
 
   return {
     scenario,
     prompt,
     messages: [...messages],
     assessment,
-    mechanismAssessment,
+    ...(mechanismAssessment ? {mechanismAssessment} : {}),
     judgeAssessments,
   };
 }
@@ -535,7 +545,9 @@ export const kora = Benchmark.new({
       });
     }
 
-    return runJudges(c.judgeModels, scenario, prompt, messages, c.trace);
+    return runJudges(c.judgeModels, scenario, prompt, messages, c.trace, {
+      skipMechanisms: c.skipMechanisms,
+    });
   },
   mapTestResultToRunResult(result) {
     const {assessment, mechanismAssessment} = result;
@@ -567,19 +579,23 @@ export const kora = Benchmark.new({
       return [f, a, e, occurrenceCount, 0];
     }
 
-    const mechanisms: Record<string, RunMechanismSums> = Object.fromEntries(
-      Mechanism.listAll().map(m => {
-        const criterion = mechanismAssessment[m.id]!;
-        return [
-          m.id,
-          mechanismSums(
-            criterion.grade,
-            criterion.occurrenceCount,
-            criterion.notTriggered
-          ),
-        ];
-      })
-    );
+    // No mechanismAssessment (judged with skipMechanisms) → empty sums record;
+    // reduceRunResult zero-fills missing keys when merging mixed runs.
+    const mechanisms: Record<string, RunMechanismSums> = mechanismAssessment
+      ? Object.fromEntries(
+          Mechanism.listAll().map(m => {
+            const criterion = mechanismAssessment[m.id]!;
+            return [
+              m.id,
+              mechanismSums(
+                criterion.grade,
+                criterion.occurrenceCount,
+                criterion.notTriggered
+              ),
+            ];
+          })
+        )
+      : {};
 
     return {
       scores: [

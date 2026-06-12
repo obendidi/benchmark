@@ -52,6 +52,11 @@ export interface TestContext {
    * and the recorded conversation keep the plain text. Ignored for other
    * prompts. */
   customUserEnvelope?: string;
+  /** Skip the per-mechanism judge call entirely: halves judge cost and avoids
+   * the large mechanism tool schema. Test results then carry no
+   * mechanismAssessment and run results have empty mechanism sums; only the
+   * overall failing/adequate/exemplary assessment is produced. */
+  skipMechanisms?: boolean;
   /** Optional observability hook. No-op when undefined. */
   trace?: (event: TraceEvent) => void;
 }

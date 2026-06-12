@@ -141,8 +141,25 @@ describe("kora.runTest", () => {
     const result = await kora.runTest(context, scenario, defaultKey);
 
     for (const mechanism of Mechanism.listAll()) {
-      expect(result.mechanismAssessment[mechanism.id]).toBeDefined();
+      expect(result.mechanismAssessment?.[mechanism.id]).toBeDefined();
     }
+  });
+
+  it("skipMechanisms omits mechanismAssessment and the mechanism judge call", async () => {
+    const context = createTestContext();
+
+    const result = await kora.runTest(
+      {...context, skipMechanisms: true},
+      scenario,
+      defaultKey
+    );
+
+    expect(result.mechanismAssessment).toBeUndefined();
+    for (const judgeAssessment of result.judgeAssessments) {
+      expect(judgeAssessment.mechanismAssessment).toBeUndefined();
+    }
+    const runResult = kora.mapTestResultToRunResult(result);
+    expect(runResult.scores[0]!.sums.mechanisms).toEqual({});
   });
 
   it("prompt matches key — default key yields 'default' prompt", async () => {

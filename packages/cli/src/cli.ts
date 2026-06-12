@@ -308,6 +308,10 @@ program
     "seconds to sleep between sequential test tasks; use with --concurrency 1 to avoid app rate-limiting (default 0)",
     "0"
   )
+  .option(
+    "--skip-mechanisms",
+    "skip the per-mechanism judge call: overall failing/adequate/exemplary grades only (halves judge cost)"
+  )
   .action((targetModel, userModel, opts) => {
     const limit =
       opts.limit !== undefined ? parseInt(opts.limit, 10) : undefined;
@@ -370,6 +374,7 @@ program
         cooldownMs: cooldownSeconds * 1000,
         customSystemPrompt,
         customUserEnvelope,
+        skipMechanisms: opts.skipMechanisms === true,
       }
     );
   });
