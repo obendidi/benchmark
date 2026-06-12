@@ -191,18 +191,16 @@
       }
     }
   },
-  "gpt-5.4:thinking:limited": {
+  "gpt-5.4:high": {
     "model": "openai/gpt-5.4",
-    "maxTokens": 26000,
     "providerOptions": {
       "openai": {
-        "reasoningEffort": "medium"
+        "reasoningEffort": "high"
       }
     }
   },
-  "gemini-3.5-flash:thinking:limited": {
+  "gemini-3.5-flash:thinking": {
     "model": "google/gemini-3.5-flash",
-    "maxTokens": 26000,
     "providerOptions": {
       "google": {
         "thinkingConfig": {
