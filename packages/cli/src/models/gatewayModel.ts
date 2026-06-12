@@ -100,6 +100,17 @@ function buildRetryOptions(
   };
 }
 
+// Prefix provider errors with the model id so a failure in a multi-model run
+// (target, user sim, three judges) identifies its source — rate-limit and
+// quota messages rarely name the model themselves.
+function labelModelError(model: string, error: unknown): never {
+  if (error instanceof Error) {
+    error.message = `[${model}] ${error.message}`;
+    throw error;
+  }
+  throw new Error(`[${model}] ${String(error)}`);
+}
+
 // The Vercel AI Gateway corrupts structured-output responses for Anthropic
 // (tool arguments dropped, returned as "{}") and for Google (thinking tags
 // leak into text when structuredOutputs is off). Bypass generateObject for
@@ -168,26 +179,30 @@ export function createGatewayModel(
       const maxTokens = request.maxTokens ?? config.maxTokens;
       const temperature = request.temperature ?? config.temperature;
 
-      const result = await withRetry(
-        () =>
-          generateText({
-            model,
-            system: request.messages.find(m => m.role === "system")?.content,
-            messages: request.messages
-              .filter(m => m.role !== "system")
-              .map(m => ({
-                role: m.role as "user" | "assistant",
-                content: m.content,
-              })),
-            maxOutputTokens: maxTokens,
-            temperature,
-            providerOptions,
-            maxRetries: 0,
-          }),
-        retryOptions
-      );
+      try {
+        const result = await withRetry(
+          () =>
+            generateText({
+              model,
+              system: request.messages.find(m => m.role === "system")?.content,
+              messages: request.messages
+                .filter(m => m.role !== "system")
+                .map(m => ({
+                  role: m.role as "user" | "assistant",
+                  content: m.content,
+                })),
+              maxOutputTokens: maxTokens,
+              temperature,
+              providerOptions,
+              maxRetries: 0,
+            }),
+          retryOptions
+        );
 
-      return result.text;
+        return result.text;
+      } catch (error) {
+        labelModelError(config.model, error);
+      }
     },
 
     async getStructuredResponse<T>(request: TypedModelRequest<T>): Promise<T> {
@@ -219,36 +234,44 @@ export function createGatewayModel(
           ? `${systemMessage}\n\n${schemaInstruction}`
           : schemaInstruction;
 
-        return withRetry(async () => {
-          const result = await generateText({
+        try {
+          return await withRetry(async () => {
+            const result = await generateText({
+              model,
+              system: combinedSystem,
+              messages: userMessages,
+              maxOutputTokens: maxTokens,
+              temperature,
+              providerOptions,
+              maxRetries: 0,
+            });
+
+            const parsed = JSON.parse(extractJson(result.text));
+            return v.parse(request.outputType, parsed);
+          }, retryOptions);
+        } catch (error) {
+          labelModelError(config.model, error);
+        }
+      }
+
+      try {
+        return await withRetry(async () => {
+          const result = await generateObject({
             model,
-            system: combinedSystem,
+            system: systemMessage,
             messages: userMessages,
+            schema: jsonSchema(outputSchema),
             maxOutputTokens: maxTokens,
             temperature,
             providerOptions,
             maxRetries: 0,
           });
 
-          const parsed = JSON.parse(extractJson(result.text));
-          return v.parse(request.outputType, parsed);
+          return v.parse(request.outputType, result.object);
         }, retryOptions);
+      } catch (error) {
+        labelModelError(config.model, error);
       }
-
-      return withRetry(async () => {
-        const result = await generateObject({
-          model,
-          system: systemMessage,
-          messages: userMessages,
-          schema: jsonSchema(outputSchema),
-          maxOutputTokens: maxTokens,
-          temperature,
-          providerOptions,
-          maxRetries: 0,
-        });
-
-        return v.parse(request.outputType, result.object);
-      }, retryOptions);
     },
   };
 }
