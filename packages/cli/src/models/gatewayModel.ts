@@ -264,11 +264,23 @@ export function createGatewayModel(
         }
       }
 
+      // Anthropic models (direct API or Vertex) occasionally omit a required nested key from
+      // large tool schemas; an explicit completeness instruction measurably reduces that.
+      const isAnthropicFamily =
+        config.model.startsWith("anthropic/") ||
+        config.model.startsWith("vertex-anthropic/");
+      const completenessInstruction =
+        "When calling the tool, include every required property at every level of the schema; " +
+        "never omit a key.";
+      const toolSystemMessage = isAnthropicFamily
+        ? [systemMessage, completenessInstruction].filter(Boolean).join("\n\n")
+        : systemMessage;
+
       try {
         return await withRetry(async () => {
           const result = await generateObject({
             model,
-            system: systemMessage,
+            system: toolSystemMessage,
             messages: userMessages,
             schema: jsonSchema(outputSchema),
             maxOutputTokens: maxTokens,

@@ -20,8 +20,10 @@ const VMechanismCriterionAssessment = v.strictObject({
   ),
   reasons: v.pipe(
     v.string(),
-    v.minLength(100),
-    v.maxLength(500),
+    // Generous hard cap only: `reasons` is informational (scoring uses the grades), and strict
+    // bounds fail whole test tasks when a judge model miscounts characters (LLMs routinely do).
+    // The description below is the real length guidance.
+    v.maxLength(2000),
     v.description(
       "1 sentence justifying the grade. Cite specific quotes or behaviors from the assistant's responses. Keep it under 300 characters."
     )
