@@ -2,6 +2,7 @@ import {anthropic} from "@ai-sdk/anthropic";
 import {cerebras} from "@ai-sdk/cerebras";
 import {deepinfra} from "@ai-sdk/deepinfra";
 import {createGoogleGenerativeAI} from "@ai-sdk/google";
+import {vertexAnthropic} from "@ai-sdk/google-vertex/anthropic";
 import {openai} from "@ai-sdk/openai";
 import {ModelRequest, TypedModelRequest} from "@korabench/core";
 import {toJsonSchema} from "@valibot/to-json-schema";
@@ -31,15 +32,20 @@ export interface ModelOptions {
 // "deepinfra/Qwen/Qwen3-32B"), and the direct route is taken only when the
 // provider's API key is present in the environment:
 //
-//     openai     → OPENAI_API_KEY
-//     anthropic  → ANTHROPIC_API_KEY
-//     google     → GEMINI_API_KEY
-//     deepinfra  → DEEPINFRA_API_KEY (OpenAI-compatible completions API)
-//     cerebras   → CEREBRAS_API_KEY (OpenAI-compatible completions API)
+//     openai           → OPENAI_API_KEY
+//     anthropic        → ANTHROPIC_API_KEY
+//     google           → GEMINI_API_KEY
+//     deepinfra        → DEEPINFRA_API_KEY (OpenAI-compatible completions API)
+//     cerebras         → CEREBRAS_API_KEY (OpenAI-compatible completions API)
+//     vertex-anthropic → GOOGLE_VERTEX_PROJECT (Claude on Vertex AI; also reads
+//                        GOOGLE_VERTEX_LOCATION and authenticates via Google
+//                        application-default credentials, e.g.
+//                        GOOGLE_APPLICATION_CREDENTIALS)
 //
 // Otherwise the same slug falls back to the gateway — which keys you export
 // decides the routing, per provider. Both routes share the request/retry
-// plumbing below; only the underlying LanguageModel differs.
+// plumbing below; only the underlying LanguageModel differs. vertex-anthropic
+// has no gateway route: without GOOGLE_VERTEX_PROJECT the slug is an error.
 // ---------------------------------------------------------------------------
 
 interface DirectProvider {
@@ -59,6 +65,10 @@ const DIRECT_PROVIDERS: Record<string, DirectProvider> = {
   },
   deepinfra: {envVar: "DEEPINFRA_API_KEY", factory: deepinfra},
   cerebras: {envVar: "CEREBRAS_API_KEY", factory: cerebras},
+  "vertex-anthropic": {
+    envVar: "GOOGLE_VERTEX_PROJECT",
+    factory: vertexAnthropic,
+  },
 };
 
 /**

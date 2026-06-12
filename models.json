@@ -121,7 +121,9 @@
     "maxTokens": 26000,
     "providerOptions": {
       "deepinfra": {
-        "chat_template_kwargs": {"thinking": true}
+        "chat_template_kwargs": {
+          "thinking": true
+        }
       }
     }
   },
@@ -222,5 +224,30 @@
         }
       }
     }
+  },
+  "claude-sonnet-4.6-vertex:limited": {
+    "model": "vertex-anthropic/claude-sonnet-4-6",
+    "maxTokens": 16000
+  },
+  "claude-haiku-4.5-vertex:limited": {
+    "model": "vertex-anthropic/claude-haiku-4-5",
+    "maxTokens": 16000
+  },
+  "claude-haiku-4.5-vertex:thinking:limited": {
+    "model": "vertex-anthropic/claude-haiku-4-5",
+    "maxTokens": 26000,
+    "temperature": 1,
+    "providerOptions": {
+      "anthropic": {
+        "thinking": {
+          "type": "enabled",
+          "budgetTokens": 8000
+        }
+      }
+    }
+  },
+  "claude-opus-4.6-vertex:limited": {
+    "model": "vertex-anthropic/claude-opus-4-6",
+    "maxTokens": 16000
   }
 }

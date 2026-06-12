@@ -19,6 +19,7 @@
     "@ai-sdk/cerebras": "^2.0.55",
     "@ai-sdk/deepinfra": "^2.0.52",
     "@ai-sdk/google": "^3.0.80",
+    "@ai-sdk/google-vertex": "^4.0.145",
     "@ai-sdk/openai": "^3.0.69",
     "@korabench/benchmark": "workspace:*",
     "@korabench/core": "^1.0.6",
