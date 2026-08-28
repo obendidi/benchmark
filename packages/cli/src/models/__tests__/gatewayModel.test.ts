@@ -7,48 +7,41 @@ describe("resolveDirectModel", () => {
   });
 
   it("returns undefined when the provider's key is not set", () => {
-    vi.stubEnv("OPENAI_API_KEY", "");
-    expect(resolveDirectModel({model: "openai/gpt-4o"})).toBeUndefined();
+    vi.stubEnv("OPENROUTER_API_KEY", "");
+    expect(
+      resolveDirectModel({model: "openrouter/openai/gpt-4o"})
+    ).toBeUndefined();
   });
 
   it("returns a model when the provider's key is set", () => {
-    vi.stubEnv("OPENAI_API_KEY", "test-key");
-    expect(resolveDirectModel({model: "openai/gpt-4o"})).toBeDefined();
-  });
-
-  it("returns undefined for unknown providers and malformed ids", () => {
-    vi.stubEnv("OPENAI_API_KEY", "test-key");
+    vi.stubEnv("OPENROUTER_API_KEY", "test-key");
     expect(
-      resolveDirectModel({model: "deepseek/deepseek-v3.2"})
-    ).toBeUndefined();
-    expect(resolveDirectModel({model: "no-provider-segment"})).toBeUndefined();
-  });
-
-  it("routes each provider segment off its own env var", () => {
-    vi.stubEnv("ANTHROPIC_API_KEY", "test-key");
-    vi.stubEnv("GEMINI_API_KEY", "");
-    expect(
-      resolveDirectModel({model: "anthropic/claude-sonnet-4-6"})
-    ).toBeDefined();
-    expect(
-      resolveDirectModel({model: "google/gemini-2.5-flash"})
-    ).toBeUndefined();
-  });
-
-  it("splits deepinfra model ids on the first slash only", () => {
-    vi.stubEnv("DEEPINFRA_API_KEY", "test-key");
-    expect(
-      resolveDirectModel({model: "deepinfra/Qwen/Qwen3-32B"})
+      resolveDirectModel({model: "openrouter/openai/gpt-4o"})
     ).toBeDefined();
   });
 
-  it("routes cerebras models off CEREBRAS_API_KEY", () => {
-    vi.stubEnv("CEREBRAS_API_KEY", "test-key");
-    expect(resolveDirectModel({model: "cerebras/gpt-oss-120b"})).toBeDefined();
-    vi.stubEnv("CEREBRAS_API_KEY", "");
+  it("splits openrouter model ids on the first slash only", () => {
+    vi.stubEnv("OPENROUTER_API_KEY", "test-key");
+    // OpenRouter ids keep their author prefix, so the id itself contains a slash.
     expect(
-      resolveDirectModel({model: "cerebras/gpt-oss-120b"})
-    ).toBeUndefined();
+      resolveDirectModel({model: "openrouter/deepseek/deepseek-v3.2"})
+    ).toBeDefined();
+  });
+
+  it("returns undefined for every other provider and for malformed ids", () => {
+    vi.stubEnv("OPENROUTER_API_KEY", "test-key");
+    // OpenRouter is the only direct provider: these are gateway slugs now.
+    for (const model of [
+      "openai/gpt-4o",
+      "anthropic/claude-sonnet-4.6",
+      "google/gemini-2.5-flash",
+      "cerebras/gpt-oss-120b",
+      "deepinfra/Qwen/Qwen3-32B",
+      "vertex-anthropic/claude-haiku-4-5",
+      "no-provider-segment",
+    ]) {
+      expect(resolveDirectModel({model})).toBeUndefined();
+    }
   });
 });
 
@@ -58,17 +51,23 @@ describe("createGatewayModel with raw direct-provider slugs", () => {
   });
 
   it("accepts a raw <provider>/<model> slug without a models.json entry", () => {
-    vi.stubEnv("CEREBRAS_API_KEY", "test-key");
+    vi.stubEnv("OPENROUTER_API_KEY", "test-key");
     // The bogus registry path proves models.json is never read on this path.
     expect(
-      createGatewayModel("/nonexistent/models.json", "cerebras/gpt-oss-120b")
+      createGatewayModel(
+        "/nonexistent/models.json",
+        "openrouter/openai/gpt-oss-120b"
+      )
     ).toBeDefined();
   });
 
   it("fails fast when the raw slug's provider key is missing", () => {
-    vi.stubEnv("CEREBRAS_API_KEY", "");
+    vi.stubEnv("OPENROUTER_API_KEY", "");
     expect(() =>
-      createGatewayModel("/nonexistent/models.json", "cerebras/gpt-oss-120b")
-    ).toThrow(/CEREBRAS_API_KEY/);
+      createGatewayModel(
+        "/nonexistent/models.json",
+        "openrouter/openai/gpt-oss-120b"
+      )
+    ).toThrow(/OPENROUTER_API_KEY/);
   });
 });

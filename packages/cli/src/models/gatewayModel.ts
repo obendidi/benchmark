@@ -1,9 +1,4 @@
-import {anthropic} from "@ai-sdk/anthropic";
-import {cerebras} from "@ai-sdk/cerebras";
-import {deepinfra} from "@ai-sdk/deepinfra";
-import {createGoogleGenerativeAI} from "@ai-sdk/google";
-import {vertexAnthropic} from "@ai-sdk/google-vertex/anthropic";
-import {openai} from "@ai-sdk/openai";
+import {createOpenAICompatible} from "@ai-sdk/openai-compatible";
 import {ModelRequest, TypedModelRequest} from "@korabench/core";
 import {toJsonSchema} from "@valibot/to-json-schema";
 import {
@@ -24,28 +19,19 @@ export interface ModelOptions {
 }
 
 // ---------------------------------------------------------------------------
-// Direct providers.
+// Direct provider.
 //
-// A models.json entry can be served directly by its provider's AI SDK package
-// instead of the Vercel AI Gateway. The provider is detected from the
-// `<provider>/` segment of the entry's `model` field (e.g. "openai/gpt-4o",
-// "deepinfra/Qwen/Qwen3-32B"), and the direct route is taken only when the
-// provider's API key is present in the environment:
+// Every models.json entry is served through OpenRouter, the single upstream this
+// CLI talks to. The provider is detected from the `<provider>/` segment of the
+// entry's `model` field and the direct route is taken only when the key is
+// present in the environment:
 //
-//     openai           → OPENAI_API_KEY
-//     anthropic        → ANTHROPIC_API_KEY
-//     google           → GEMINI_API_KEY
-//     deepinfra        → DEEPINFRA_API_KEY (OpenAI-compatible completions API)
-//     cerebras         → CEREBRAS_API_KEY (OpenAI-compatible completions API)
-//     vertex-anthropic → GOOGLE_VERTEX_PROJECT (Claude on Vertex AI; also reads
-//                        GOOGLE_VERTEX_LOCATION and authenticates via Google
-//                        application-default credentials, e.g.
-//                        GOOGLE_APPLICATION_CREDENTIALS)
+//     openrouter → OPENROUTER_API_KEY (OpenAI-compatible completions API)
 //
-// Otherwise the same slug falls back to the gateway — which keys you export
-// decides the routing, per provider. Both routes share the request/retry
-// plumbing below; only the underlying LanguageModel differs. vertex-anthropic
-// has no gateway route: without GOOGLE_VERTEX_PROJECT the slug is an error.
+// OpenRouter model ids keep their author prefix, so an entry's `model` carries
+// two slashes, e.g. "openrouter/deepseek/deepseek-v3.2". A slug naming any
+// other provider has no direct route and falls through to the Vercel AI
+// Gateway, which needs AI_GATEWAY_API_KEY.
 // ---------------------------------------------------------------------------
 
 interface DirectProvider {
@@ -54,20 +40,21 @@ interface DirectProvider {
 }
 
 const DIRECT_PROVIDERS: Record<string, DirectProvider> = {
-  openai: {envVar: "OPENAI_API_KEY", factory: openai},
-  anthropic: {envVar: "ANTHROPIC_API_KEY", factory: anthropic},
-  google: {
-    envVar: "GEMINI_API_KEY",
-    // @ai-sdk/google's default instance reads GOOGLE_GENERATIVE_AI_API_KEY;
-    // pass the key explicitly so GEMINI_API_KEY is the single source.
+  openrouter: {
+    envVar: "OPENROUTER_API_KEY",
     factory: id =>
-      createGoogleGenerativeAI({apiKey: process.env.GEMINI_API_KEY})(id),
-  },
-  deepinfra: {envVar: "DEEPINFRA_API_KEY", factory: deepinfra},
-  cerebras: {envVar: "CEREBRAS_API_KEY", factory: cerebras},
-  "vertex-anthropic": {
-    envVar: "GOOGLE_VERTEX_PROJECT",
-    factory: vertexAnthropic,
+      createOpenAICompatible({
+        // `name` is also the providerOptions key: an entry's
+        // providerOptions.openrouter is spread into the request body, so
+        // OpenRouter's own params (reasoning, provider routing) pass through.
+        name: "openrouter",
+        baseURL: "https://openrouter.ai/api/v1",
+        apiKey: process.env.OPENROUTER_API_KEY,
+        // Emit response_format json_schema for generateObject. Without this the
+        // default is json_object, which OpenAI rejects unless the prompt itself
+        // contains the word "json" — it fails every judge call.
+        supportsStructuredOutputs: true,
+      })(id),
   },
 };
 
