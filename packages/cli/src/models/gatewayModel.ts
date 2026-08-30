@@ -1,3 +1,4 @@
+import {cerebras} from "@ai-sdk/cerebras";
 import {createOpenAICompatible} from "@ai-sdk/openai-compatible";
 import {ModelRequest, TypedModelRequest} from "@korabench/core";
 import {toJsonSchema} from "@valibot/to-json-schema";
@@ -19,7 +20,7 @@ export interface ModelOptions {
 }
 
 // ---------------------------------------------------------------------------
-// Direct provider.
+// Direct providers.
 //
 // Every models.json entry is served through OpenRouter, the single upstream this
 // CLI talks to. The provider is detected from the `<provider>/` segment of the
@@ -27,11 +28,20 @@ export interface ModelOptions {
 // present in the environment:
 //
 //     openrouter → OPENROUTER_API_KEY (OpenAI-compatible completions API)
+//     cerebras   → CEREBRAS_API_KEY (OpenAI-compatible completions API)
+//
+// OpenRouter is the default route and reaches every model. Cerebras is kept as
+// a second direct route for the models it serves, because OpenRouter strips
+// their reasoning controls: every OpenRouter endpoint for
+// google/gemma-4-31b-it advertises `reasoning` but not `reasoning_effort`, so
+// through that route the model cannot be made to reason at all. Calling
+// Cerebras directly also matches how these models are served in production.
 //
 // OpenRouter model ids keep their author prefix, so an entry's `model` carries
-// two slashes, e.g. "openrouter/deepseek/deepseek-v3.2". A slug naming any
-// other provider has no direct route and falls through to the Vercel AI
-// Gateway, which needs AI_GATEWAY_API_KEY.
+// two slashes (e.g. "openrouter/deepseek/deepseek-v3.2"); Cerebras ids have
+// none (e.g. "cerebras/gemma-4-31b"). A slug naming any other provider has no
+// direct route and falls through to the Vercel AI Gateway, which needs
+// AI_GATEWAY_API_KEY.
 // ---------------------------------------------------------------------------
 
 interface DirectProvider {
@@ -40,6 +50,7 @@ interface DirectProvider {
 }
 
 const DIRECT_PROVIDERS: Record<string, DirectProvider> = {
+  cerebras: {envVar: "CEREBRAS_API_KEY", factory: cerebras},
   openrouter: {
     envVar: "OPENROUTER_API_KEY",
     factory: id =>

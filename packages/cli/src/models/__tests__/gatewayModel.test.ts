@@ -28,14 +28,21 @@ describe("resolveDirectModel", () => {
     ).toBeDefined();
   });
 
+  it("routes cerebras models off CEREBRAS_API_KEY", () => {
+    vi.stubEnv("CEREBRAS_API_KEY", "test-key");
+    expect(resolveDirectModel({model: "cerebras/gemma-4-31b"})).toBeDefined();
+    vi.stubEnv("CEREBRAS_API_KEY", "");
+    expect(resolveDirectModel({model: "cerebras/gemma-4-31b"})).toBeUndefined();
+  });
+
   it("returns undefined for every other provider and for malformed ids", () => {
     vi.stubEnv("OPENROUTER_API_KEY", "test-key");
-    // OpenRouter is the only direct provider: these are gateway slugs now.
+    vi.stubEnv("CEREBRAS_API_KEY", "test-key");
+    // Only openrouter and cerebras route directly: these are gateway slugs.
     for (const model of [
       "openai/gpt-4o",
       "anthropic/claude-sonnet-4.6",
       "google/gemini-2.5-flash",
-      "cerebras/gpt-oss-120b",
       "deepinfra/Qwen/Qwen3-32B",
       "vertex-anthropic/claude-haiku-4-5",
       "no-provider-segment",

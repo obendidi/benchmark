@@ -5,6 +5,19 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
+"@ai-sdk/cerebras@npm:^2.0.55":
+  version: 2.0.80
+  resolution: "@ai-sdk/cerebras@npm:2.0.80"
+  dependencies:
+    "@ai-sdk/openai-compatible": "npm:2.0.74"
+    "@ai-sdk/provider": "npm:3.0.15"
+    "@ai-sdk/provider-utils": "npm:4.0.50"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/d8a86a4c7632c9b47ab2366b2159835d73c66d470e244d95c54828f7844f68574ee807cc2e073ae0fad661d2b7c77a240aa0a7e1f8c427d2ef0095b9b438a9c8
+  languageName: node
+  linkType: hard
+
 "@ai-sdk/gateway@npm:3.0.41":
   version: 3.0.41
   resolution: "@ai-sdk/gateway@npm:3.0.41"
@@ -15,6 +28,18 @@ __metadata:
   peerDependencies:
     zod: ^3.25.76 || ^4.1.8
   checksum: 10c0/3b91f3f05140c755e259a5541e943b527c54f41ad3f390083159e9df909554c88d07e1d4cd75f002e92a2098e490f2621586feb39d5020253fcee50a44846215
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/openai-compatible@npm:2.0.74":
+  version: 2.0.74
+  resolution: "@ai-sdk/openai-compatible@npm:2.0.74"
+  dependencies:
+    "@ai-sdk/provider": "npm:3.0.15"
+    "@ai-sdk/provider-utils": "npm:4.0.50"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/f3589e7de8afdf950cd073623f61ae7de4dbde18bc938c28dfc28034b9d04e5ef78a5150e1ad250a140b63be147e0d1d305c8829fef609d15d65a2a2545c9f1a
   languageName: node
   linkType: hard
 
@@ -54,6 +79,20 @@ __metadata:
   peerDependencies:
     zod: ^3.25.76 || ^4.1.8
   checksum: 10c0/0fb6b4da8cfaf6bcdaaafc9b450969c46b160e9e0eda8e2827288b1985c9d77943c8cb0c5e5096033a839c9d6b1f06e09399ed95967644d1aba61680018f3055
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/provider-utils@npm:4.0.50":
+  version: 4.0.50
+  resolution: "@ai-sdk/provider-utils@npm:4.0.50"
+  dependencies:
+    "@ai-sdk/provider": "npm:3.0.15"
+    "@standard-schema/spec": "npm:^1.1.0"
+    eventsource-parser: "npm:^3.0.8"
+    undici: "npm:^6.28.0"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/c80ea0a8489da063aa704a431354c4d9136880ab30c6e54324d9458cfb02ea30858bac24e8d559a21de3b984fec16b6aedee6e2ce85687f11d8a65a06311ed86
   languageName: node
   linkType: hard
 
@@ -650,6 +689,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@korabench/cli@workspace:packages/cli"
   dependencies:
+    "@ai-sdk/cerebras": "npm:^2.0.55"
     "@ai-sdk/openai-compatible": "npm:^2.0.50"
     "@commander-js/extra-typings": "npm:14.0.0"
     "@korabench/benchmark": "workspace:*"
